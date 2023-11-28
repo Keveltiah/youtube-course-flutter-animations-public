@@ -314,9 +314,12 @@ class _MyMovingRotatingWidgetState extends State<MyMovingRotatingWidget>
                   // ..rotateX(pi * 2.0)
                   ..rotateY(_controller.value * 2.0 * pi) // Rotation around X-axis
                   ..translate(
-                  _offsetAnimation.value.dx * constraints.maxHeight,
-                    _offsetAnimation.value.dy * constraints.maxWidth,
+                    _offsetAnimation.value.dx * constraints.maxHeight,
+                    - _offsetAnimation.value.dy * constraints.maxWidth,
                     0.0,
+                  // _offsetAnimation.value.dx * constraints.maxHeight,
+                  //   _offsetAnimation.value.dy * constraints.maxWidth,
+                  //   0.0,
                   ), // Translation
                 child: Stack(
                   children: [
@@ -342,9 +345,10 @@ class Cube3D extends StatefulWidget {
   @override
   _Cube3DState createState() => _Cube3DState();
 }
-class _Cube3DState extends State<Cube3D> {
+class _Cube3DState extends State<Cube3D> with TickerProviderStateMixin{
   double _angleX = 0.0;
   double _angleY = 0.0;
+  double size = 300;
 
   @override
   Widget build(BuildContext context) {
@@ -367,71 +371,78 @@ class _Cube3DState extends State<Cube3D> {
         _angleY += 0.1;
       });
     });
+
+    Timer.periodic(Duration(milliseconds: 80), (timer) {
+      setState(() {
+        if (size < widthAndHeight){
+          // size = widthAndHeight;
+        }else{
+          size -= 8;
+        }
+      });
+    });
+  }
+
+  Widget Cube(){
+    return Stack(
+      children: [
+        // back
+        Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.001) ,// Perspective effect
+            // ..translate(Vector3(0, 0, -widthAndHeight)),
+          child: Image.asset('assets/images/dice_1.png', fit: BoxFit.cover, width: size,),
+        ),
+        // left side
+        Transform(
+          alignment: Alignment.centerLeft,
+          transform: Matrix4.identity()
+          ..setEntry(3, 2, 0.001) // Perspective effect
+          ..rotateY(pi / 2.0),
+          child: Image.asset('assets/images/dice_2.png', fit: BoxFit.cover, width: size,),
+        ),
+        // left side
+        Transform(
+          alignment: Alignment.centerRight,
+          transform: Matrix4.identity()
+          ..setEntry(3, 2, 0.001) // Perspective effect
+          ..rotateY(-pi / 2.0),
+          child: Image.asset('assets/images/dice_3.png', fit: BoxFit.cover, width: size,),
+        ),
+        // front
+        Container(
+          color: Colors.black54,
+          width: size,
+          height: size,
+        ),
+        // top side
+        Transform(
+          alignment: Alignment.topCenter,
+          transform: Matrix4.identity()
+          ..setEntry(3, 2, 0.001) // Perspective effect
+          ..rotateX(-pi / 2.0),
+          child: Image.asset('assets/images/dice_4.png', fit: BoxFit.cover, width: size,),
+        ),
+        // bottom side
+        Transform(
+          alignment: Alignment.bottomCenter,
+          transform: Matrix4.identity()
+          ..setEntry(3, 2, 0.001) // Perspective effect
+          ..rotateX(pi / 2.0),
+          child: Image.asset('assets/images/dice_5.png', fit: BoxFit.cover, width: size,),
+        ),
+        Transform(
+          alignment: Alignment.bottomCenter,
+          transform: Matrix4.identity()
+          ..setEntry(3, 2, 0.001) // Perspective effect
+          ..rotateX(pi / 2.0),
+          child: Image.asset('assets/images/dice_6.png', fit: BoxFit.cover, width: size,),
+        ),
+      ],
+    );
   }
 }
-
-
-Widget Cube(){
-  return Stack(
-    children: [
-      // back
-      Transform(
-        alignment: Alignment.center,
-        transform: Matrix4.identity()
-          ..setEntry(3, 2, 0.001) // Perspective effect
-          ..translate(Vector3(0, 0, -widthAndHeight)),
-        child: Image.asset('assets/images/dice_1.png', fit: BoxFit.cover, width: widthAndHeight,),
-      ),
-      // left side
-      Transform(
-        alignment: Alignment.centerLeft,
-        transform: Matrix4.identity()
-        ..setEntry(3, 2, 0.001) // Perspective effect
-        ..rotateY(pi / 2.0),
-        child: Image.asset('assets/images/dice_2.png', fit: BoxFit.cover, width: widthAndHeight,),
-      ),
-      // left side
-      Transform(
-        alignment: Alignment.centerRight,
-        transform: Matrix4.identity()
-        ..setEntry(3, 2, 0.001) // Perspective effect
-        ..rotateY(-pi / 2.0),
-        child: Image.asset('assets/images/dice_3.png', fit: BoxFit.cover, width: widthAndHeight,),
-      ),
-      // front
-      Container(
-        color: Colors.black54,
-        width: widthAndHeight,
-        height: widthAndHeight,
-      ),
-      // top side
-      Transform(
-        alignment: Alignment.topCenter,
-        transform: Matrix4.identity()
-        ..setEntry(3, 2, 0.001) // Perspective effect
-        ..rotateX(-pi / 2.0),
-        child: Image.asset('assets/images/dice_4.png', fit: BoxFit.cover, width: widthAndHeight,),
-      ),
-      // bottom side
-      Transform(
-        alignment: Alignment.bottomCenter,
-        transform: Matrix4.identity()
-        ..setEntry(3, 2, 0.001) // Perspective effect
-        ..rotateX(pi / 2.0),
-        child: Image.asset('assets/images/dice_5.png', fit: BoxFit.cover, width: widthAndHeight,),
-      ),
-      Transform(
-        alignment: Alignment.bottomCenter,
-        transform: Matrix4.identity()
-        ..setEntry(3, 2, 0.001) // Perspective effect
-        ..rotateX(pi / 2.0),
-        child: Image.asset('assets/images/dice_6.png', fit: BoxFit.cover, width: widthAndHeight,),
-      ),
-    ],
-  );
-}
-
-
 
 
 
