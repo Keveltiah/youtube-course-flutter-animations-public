@@ -252,11 +252,12 @@ class _MyMovingRotatingWidgetState extends State<MyMovingRotatingWidget>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 2),
-    )..repeat(reverse: false);
+      duration: Duration(seconds: 3),
+    )..forward();
+
     _offsetAnimation = Tween<Offset>(
-      begin: Offset(0, -1),
-      end: Offset(0, 0),
+      begin: Offset(-0.1, -3),
+      end: Offset(0.1, 0),
     ).animate(_controller);
     // _controller.addStatusListener((status) {
     //   if (status == AnimationStatus.forward || status == AnimationStatus.reverse) {
@@ -310,17 +311,16 @@ class _MyMovingRotatingWidgetState extends State<MyMovingRotatingWidget>
               return Transform(
                 transform: Matrix4.identity()
                   ..setEntry(3, 2, 0.001) // Perspective
-                  ..rotateX(pi * 2.0)
-                  // ..rotateX(_controller.value * 2.0 * pi) // Rotation around X-axis
-                  ..translate(0.0,
+                  // ..rotateX(pi * 2.0)
+                  ..rotateY(_controller.value * 2.0 * pi) // Rotation around X-axis
+                  ..translate(
                   _offsetAnimation.value.dx * constraints.maxHeight,
                     _offsetAnimation.value.dy * constraints.maxWidth,
-                    // 0.0,
+                    0.0,
                   ), // Translation
                 child: Stack(
                   children: [
-                    Cube(),
-                    Text("azdazdaz")
+                    Cube3D(),
                   ],
                 ),
               );
@@ -336,64 +336,172 @@ class _MyMovingRotatingWidgetState extends State<MyMovingRotatingWidget>
     _controller.dispose();
     super.dispose();
   }
+}
 
-  Widget Cube(){
-    return Stack(
-      children: [
-        // back
-        Transform(
-          alignment: Alignment.center,
-          transform: Matrix4.identity()
-            ..setEntry(3, 2, 0.001) // Perspective effect
-            ..translate(Vector3(0, 0, -widthAndHeight)),
-          child: Image.asset('assets/images/dice_1.png', fit: BoxFit.cover, width: widthAndHeight,),
-        ),
-        // left side
-        Transform(
-          alignment: Alignment.centerLeft,
-          transform: Matrix4.identity()
-          ..setEntry(3, 2, 0.001) // Perspective effect
-          ..rotateY(pi / 2.0),
-          child: Image.asset('assets/images/dice_2.png', fit: BoxFit.cover, width: widthAndHeight,),
-        ),
-        // left side
-        Transform(
-          alignment: Alignment.centerRight,
-          transform: Matrix4.identity()
-          ..setEntry(3, 2, 0.001) // Perspective effect
-          ..rotateY(-pi / 2.0),
-          child: Image.asset('assets/images/dice_3.png', fit: BoxFit.cover, width: widthAndHeight,),
-        ),
-        // front
-        Container(
-          color: Colors.black54,
-          width: widthAndHeight,
-          height: widthAndHeight,
-        ),
-        // top side
-        Transform(
-          alignment: Alignment.topCenter,
-          transform: Matrix4.identity()
-          ..setEntry(3, 2, 0.001) // Perspective effect
-          ..rotateX(-pi / 2.0),
-          child: Image.asset('assets/images/dice_4.png', fit: BoxFit.cover, width: widthAndHeight,),
-        ),
-        // bottom side
-        Transform(
-          alignment: Alignment.bottomCenter,
-          transform: Matrix4.identity()
-          ..setEntry(3, 2, 0.001) // Perspective effect
-          ..rotateX(pi / 2.0),
-          child: Image.asset('assets/images/dice_5.png', fit: BoxFit.cover, width: widthAndHeight,),
-        ),
-        Transform(
-          alignment: Alignment.bottomCenter,
-          transform: Matrix4.identity()
-          ..setEntry(3, 2, 0.001) // Perspective effect
-          ..rotateX(pi / 2.0),
-          child: Image.asset('assets/images/dice_6.png', fit: BoxFit.cover, width: widthAndHeight,),
-        ),
-      ],
+class Cube3D extends StatefulWidget {
+  @override
+  _Cube3DState createState() => _Cube3DState();
+}
+class _Cube3DState extends State<Cube3D> {
+  double _angleX = 0.0;
+  double _angleY = 0.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform(
+      transform: Matrix4.identity()
+        ..setEntry(3, 2, 0.001) // Perspective
+        ..rotateX(_angleX)
+        ..rotateY(_angleY),
+      alignment: FractionalOffset.center,
+      child: Cube(),
     );
   }
+
+  @override
+  void initState() {
+    super.initState();
+    Timer.periodic(Duration(milliseconds: 100), (timer) {
+      setState(() {
+        _angleX += 0.1;
+        _angleY += 0.1;
+      });
+    });
+  }
 }
+
+
+Widget Cube(){
+  return Stack(
+    children: [
+      // back
+      Transform(
+        alignment: Alignment.center,
+        transform: Matrix4.identity()
+          ..setEntry(3, 2, 0.001) // Perspective effect
+          ..translate(Vector3(0, 0, -widthAndHeight)),
+        child: Image.asset('assets/images/dice_1.png', fit: BoxFit.cover, width: widthAndHeight,),
+      ),
+      // left side
+      Transform(
+        alignment: Alignment.centerLeft,
+        transform: Matrix4.identity()
+        ..setEntry(3, 2, 0.001) // Perspective effect
+        ..rotateY(pi / 2.0),
+        child: Image.asset('assets/images/dice_2.png', fit: BoxFit.cover, width: widthAndHeight,),
+      ),
+      // left side
+      Transform(
+        alignment: Alignment.centerRight,
+        transform: Matrix4.identity()
+        ..setEntry(3, 2, 0.001) // Perspective effect
+        ..rotateY(-pi / 2.0),
+        child: Image.asset('assets/images/dice_3.png', fit: BoxFit.cover, width: widthAndHeight,),
+      ),
+      // front
+      Container(
+        color: Colors.black54,
+        width: widthAndHeight,
+        height: widthAndHeight,
+      ),
+      // top side
+      Transform(
+        alignment: Alignment.topCenter,
+        transform: Matrix4.identity()
+        ..setEntry(3, 2, 0.001) // Perspective effect
+        ..rotateX(-pi / 2.0),
+        child: Image.asset('assets/images/dice_4.png', fit: BoxFit.cover, width: widthAndHeight,),
+      ),
+      // bottom side
+      Transform(
+        alignment: Alignment.bottomCenter,
+        transform: Matrix4.identity()
+        ..setEntry(3, 2, 0.001) // Perspective effect
+        ..rotateX(pi / 2.0),
+        child: Image.asset('assets/images/dice_5.png', fit: BoxFit.cover, width: widthAndHeight,),
+      ),
+      Transform(
+        alignment: Alignment.bottomCenter,
+        transform: Matrix4.identity()
+        ..setEntry(3, 2, 0.001) // Perspective effect
+        ..rotateX(pi / 2.0),
+        child: Image.asset('assets/images/dice_6.png', fit: BoxFit.cover, width: widthAndHeight,),
+      ),
+    ],
+  );
+}
+
+
+
+
+
+// class MyMovingRotatingCube extends StatefulWidget {
+//   @override
+//   _MyMovingRotatingCubeState createState() => _MyMovingRotatingCubeState();
+// }
+
+// class _MyMovingRotatingCubeState extends State<MyMovingRotatingCube> with TickerProviderStateMixin{
+//   double _angleX = 0.0;
+//   double _angleY = 0.0;
+//   double _x = 0.0;
+//   double _y = 0.0;
+//   late AnimationController _controller;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _controller = AnimationController(
+//       vsync: this,
+//       duration: Duration(seconds: 2),
+//     )..stop();
+//     Timer.periodic(Duration(milliseconds: 16), (timer) {
+//       setState(() {
+//         _angleX += 0.01; // Update rotation angle
+//         _angleY += 0.01; // Update rotation angle
+//         _x += 1; // Update x position
+//         _y += 1; // Update y position
+//       });
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//      final screenSize = MediaQuery.of(context).size;
+//     final cubeSize = 100.0;
+
+//     // Ensure the cube stays within the bounds of the screen
+//     setState(() {
+//       if (_x < 0) {
+//         _x = 0;
+//       } else if (_x > screenSize.width - cubeSize) {
+//         _x = screenSize.width - cubeSize;
+//       }
+
+//       if (_y < 0) {
+//         _y = 0;
+//       } else if (_y > screenSize.height - cubeSize) {
+//         _y = screenSize.height - cubeSize;
+//       }
+//     });
+    
+//     return AnimatedBuilder(
+//       animation: _controller,
+//       builder: (context, child) {
+//         return Transform(
+//           transform: Matrix4.identity()
+//             ..setEntry(3, 2, 0.001) // Perspective
+//             ..rotateX(_angleX)
+//             ..rotateY(_angleY)
+//             ..translate(_x, _y, 0.0), // Translation
+//           alignment: FractionalOffset.center,
+//           child: Container(
+//             width: cubeSize,
+//             height: cubeSize,
+//             color: Colors.blue,
+//           ),
+//         );
+//       },
+//     );
+//   }
+
+// }
